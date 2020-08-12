@@ -11,7 +11,6 @@ import GlobalLayout from './../layouts/GlobalLayout';
 
 const theme = createMuiTheme(themCofing);
 
-
 const mapStateToProps = (state) => ({
     users: _.get(state, 'userList.userList', []),
 });

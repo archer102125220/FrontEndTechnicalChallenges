@@ -1,5 +1,4 @@
 import fetch from './../utils/request';
-// import Socket from './../utils/socket';
 
 
 export function GET_userList(payload = {}, token) {

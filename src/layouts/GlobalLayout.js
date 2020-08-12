@@ -7,18 +7,31 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import Button from './../lib/components/Button';
 
-const styles = {
-    root: {
-      flexGrow: 1,
-    },
-    paper: {
-      padding: 2,
-      textAlign: 'center',
-      color: 'primary'
-    }
-  };
-  
+const styles = (them) => {
+    const style = {
+        padding: 2,
+        color: them.palette.fontColor.main,
+        backgroundColor: them.palette.fontbackgroundColor.main,
+        height: '5vh',
+        borderRadius: 0,
+        boxShadow: '0px 0px 0px 0px rgba(0,0,0,0.2), 0px 0px 0px 0px rgba(0,0,0,0.14), 0px 0px 0px 0px rgba(0,0,0,0.12)',
+    };
+    return {
+        paperTitle: {
+            ...style,
+            paddingLeft: '10px',
+            lineHeight: '5vh',
+            textAlign: 'left'
+        },
+        paperButton: {
+            ...style,
+            paddingRight: '10px',
+            textAlign: 'right'
+        }
+    };
+};
 
 const mapStateToProps = (state) => ({
     users: _.get(state, 'userList.userList', []),
@@ -40,13 +53,14 @@ export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(
             const { children, classes } = this.props;
 
             return (<Typography component='div'>
-                    <div className={classes.root}>
-                        <Grid container spacing={3}>
-                            <Grid item xs={12}>
-                                <Paper className={classes.paper}>xs=12</Paper>
-                            </Grid>
-                        </Grid>
-                    </div>
+                <Grid container spacing={0}>
+                    <Grid item xs={6}>
+                        <Paper className={classes.paperTitle}>FrontEndTechnicalChallenges</Paper>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Paper className={classes.paperButton}><Button>顯示表格</Button></Paper>
+                    </Grid>
+                </Grid>
                 {children}
             </Typography>);
         }
