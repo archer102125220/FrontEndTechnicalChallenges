@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'PropTypes';
 import GoogleMapReact from 'google-map-react';
 
 //https://www.npmjs.com/package/google-map-react
