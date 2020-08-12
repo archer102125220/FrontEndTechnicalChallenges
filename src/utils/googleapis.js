@@ -103,8 +103,7 @@ const MyMapComponent = compose(
                 ref={props.onMapMounted}
                 onBoundsChanged={props.fetchPlaces}
                 defaultZoom={8}
-                defaultCenter={{ lat: 51.508530, lng: -0.076132 }}
-                type='restaurant'>
+                defaultCenter={{ lat: 51.508530, lng: -0.076132 }}>
                 <SearchBox
                     ref={props.onSearchBoxMounted}
                     bounds={props.bounds}
