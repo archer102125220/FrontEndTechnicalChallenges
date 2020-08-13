@@ -1,12 +1,12 @@
 
-import { GET_userList, /*SOCKET_UserList*/ } from './../services/userList';
+// import { GET_userList, /*SOCKET_UserList*/ } from '../services/placesList';
 
 export default {
 
-  namespace: 'userList',
+  namespace: 'placesList',
 
   state: {
-    userList: []
+    placesList: []
   },
 
   // subscriptions: {
@@ -15,9 +15,9 @@ export default {
   // },
 
   effects: {
-    *GET_UserList({ payload }, { call, put }) {  // eslint-disable-line
-      const data = yield call(GET_userList);
-      yield put({ type: 'set_user_list', payload: data });
+    *GET_PlacesList({ payload, callback, loading }, { call, put }) {  // eslint-disable-line
+      yield put({ type: 'set_places_list', payload });
+      if (callback) callback();
     },
     /*
     *SOCKET_UserList({ payload, callback, loading, token }, { call, put }) {  // eslint-disable-line
@@ -30,8 +30,8 @@ export default {
   },
 
   reducers: {
-    set_user_list(state, { payload }) {
-      return { ...state, userList: payload };
+    set_places_list(state, { payload }) {
+      return { ...state, placesList: payload };
     },
   },
 

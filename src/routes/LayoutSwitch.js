@@ -12,7 +12,7 @@ import GlobalLayout from './../layouts/GlobalLayout';
 const theme = createMuiTheme(themCofing);
 
 const mapStateToProps = (state) => ({
-    users: _.get(state, 'userList.userList', []),
+    places: _.get(state, 'placesList.placesList', []),
 });
 
 const mapDispatchToProps = (/*dispatch*/) => ({
@@ -21,6 +21,12 @@ const mapDispatchToProps = (/*dispatch*/) => ({
 
 export default connect(mapStateToProps, mapDispatchToProps)(
     class LayoutSwitch extends Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                isMobile: false,
+            };
+        }
 
         componentDidMount = () => {
             // const { SOCKET_UserList } = this.props;
@@ -39,15 +45,15 @@ export default connect(mapStateToProps, mapDispatchToProps)(
         }
 
         render() {
-            const { props } = this;
+            const { props, state } = this;
             const { children/*, history*/ } = props;
             // const { location } = history;
             // const { pathname } = location;
             return (
                 <ThemeProvider theme={theme}>
                     {
-                        <GlobalLayout {...props}>
-                            <Switch {...props}>{children}</Switch>
+                        <GlobalLayout isMobile={state.isMobile} {...props}>
+                            <Switch isMobile={state.isMobile} {...props}>{children}</Switch>
                         </GlobalLayout>
                     }
                 </ThemeProvider>);

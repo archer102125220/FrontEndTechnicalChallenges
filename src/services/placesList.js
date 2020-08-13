@@ -1,4 +1,4 @@
-import fetch from './../utils/request';
+import fetch from '../utils/request';
 
 
 export function GET_userList(payload = {}, token) {

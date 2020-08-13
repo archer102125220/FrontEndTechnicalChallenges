@@ -18,15 +18,15 @@ import { SearchBox } from 'react-google-maps/lib/components/places/SearchBox';
 const { GoogleMap: GoogleMapReact } = require('react-google-maps');
 
 const key = process.env.GOOGLE_MAP_API_KEY;
-const type = (process.env.GOOGLE_MAP_SEARCH_TYPE || '').split(',');
 
 const refs = {
     map: undefined,
+    types: ['restaurant'],
 };
 //https://neighborhood999.github.io/recompose/docs/API.html
-const MyMapComponent = compose(
+export const GoogleMap = compose(
     withProps({
-        googleMapURL: 'https://maps.googleapis.com/maps/api/js?key=' + key + '&v=3.exp&libraries=geometry,drawing,places',
+        googleMapURL: 'https://maps.googleapis.com/maps/api/js?key=' + key + '&v=3.exp&libraries=places',
         loadingElement: <div style={{ height: '94vh' }} />,
         containerElement: <div style={{ height: '94vh' }} />,
         mapElement: <div style={{ height: '94vh' }} />,
@@ -48,11 +48,18 @@ const MyMapComponent = compose(
             const service = new google.maps.places.PlacesService(refs.map.context.__SECRET_MAP_DO_NOT_USE_OR_YOU_WILL_BE_FIRED);
             const request = {
                 bounds: bounds,
-                type
+                // radius: '500',
+                type: refs.types,
+                fields: ['opening_hours', 'utc_offset_minutes'],
             };
             service.nearbySearch(request, (results, status) => {
                 // eslint-disable-next-line no-undef
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
+                    // const resultsIsOpenNow = results.filter((places) => {
+                    //     const isOpenNow = places.opening_hours;
+                    //     console.log(places, isOpenNow);
+                    //     return isOpenNow;
+                    // });
                     updatePlaces(results);
                 }
             });
@@ -60,8 +67,11 @@ const MyMapComponent = compose(
     })
     // eslint-disable-next-line react/display-name
 )(class extends Component {
-    state = {
-        places: []
+    constructor(props) {
+        super(props);
+        this.state = {
+            places: []
+        };
     }
 
     onPlacesChanged = () => {
@@ -79,20 +89,39 @@ const MyMapComponent = compose(
         refs.map.fitBounds(bounds);
     }
 
-    componentDidMount() {
-        const { props } = this;
-        this.setState({
-            places: props.places
-        });
-    }
-
     componentDidUpdate() {
         const { props, state } = this;
-        if (props.places != state.places) {
+        if (props.places !== state.places) {
             this.setState({
                 places: props.places
             });
+            props.setPlaces(props.places);
         }
+        if (props.type !== refs.type) {
+            refs.type = props.type;
+        }
+    }
+
+    inputRender(element) {
+        let inputElement = <input
+            type='text'
+            placeholder='輸入地址...'
+            style={{
+                boxSizing: 'border-box',
+                border: '1px solid transparent',
+                width: '240px',
+                height: '35px',
+                marginTop: '15px',
+                padding: '0 12px',
+                borderRadius: '3px',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
+                fontSize: '14px',
+                outline: 'none',
+                textOverflow: 'ellipses',
+            }}
+        />;
+        if (element !== undefined) inputElement = element;
+        return inputElement;
     }
 
     render() {
@@ -111,27 +140,12 @@ const MyMapComponent = compose(
                     controlPosition={google.maps.ControlPosition.TOP_LEFT}
                     onPlacesChanged={this.onPlacesChanged}
                 >
-                    <input
-                        type="text"
-                        placeholder="輸入地址..."
-                        style={{
-                            boxSizing: 'border-box',
-                            border: '1px solid transparent',
-                            width: '240px',
-                            height: '35px',
-                            marginTop: '15px',
-                            padding: '0 12px',
-                            borderRadius: '3px',
-                            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
-                            fontSize: '14px',
-                            outline: 'none',
-                            textOverflow: 'ellipses',
-                        }}
-                    />
+                    {this.inputRender(props.input)}
                 </SearchBox>
-                {state.places && state.places.map((place, i) =>
-                    <Marker key={i} position={{ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }} />
-                )}
+                {state.places && state.places.map((place, i) => {
+                    // console.log(place);
+                    return (<Marker key={i} position={{ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }} />);
+                })}
             </GoogleMapReact>
         );
     }
@@ -144,15 +158,21 @@ const MyMapComponent = compose(
         places: PropTypes.any,
         Zoom: PropTypes.number,
         center: PropTypes.object,
-        bounds: PropTypes.any
+        bounds: PropTypes.any,
+        input: PropTypes.object,
+        type: PropTypes.array,
+        setPlaces: PropTypes.func
+    }
+    static defaultProps = {
+        setPlaces: () => { }
     }
 });
 
-export class GoogleMap extends Component {
-    render() {
-        return (
-            <MyMapComponent />
-        );
-    }
-}
+// export class GoogleMap extends Component {
+//     render() {
+//         return (
+//             <MyMapComponent />
+//         );
+//     }
+// }
 //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=24.985175,121.440307&radius=500&type=restaurant&keyword=餐廳&key=

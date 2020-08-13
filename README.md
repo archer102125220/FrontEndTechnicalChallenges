@@ -4,7 +4,7 @@
 - dva
 - dotenv
 - material-ui
-- google-map-react
+- react-google-maps
 - dva
 - eslint
 - babel
