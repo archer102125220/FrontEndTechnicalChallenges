@@ -60,22 +60,6 @@ class IndexPage extends Component {
       inputValue: e.target.value
     });
   }
-
-  // getPlaces = (places) => {
-  //   this.setState({
-  //     places
-  //   });
-  //   this.props.GET_PlacesList(places);
-  // }
-
-  // componentDidUpdate = () => {
-  //   const { props, state } = this;
-  //   if (props.placesList !== state.places) {
-  //     // props.GET_PlacesList(state.places);
-  //     console.log(props.placesList !== state.places);
-  //   } console.log(props.placesList);
-  // }
-
   componentDidMount = () => {
     this.enquireHandler = enquireScreen(mobile => {
       this.setState({
@@ -92,7 +76,7 @@ class IndexPage extends Component {
         <GoogleMap
           setPlaces={this.props.GET_PlacesList}
           input={
-            <div className={isMobile ? classes.isMobileRoot : classes.root} 
+            <div className={isMobile ? classes.isMobileRoot : classes.root}
             // style={{ display: isMobile && !viewMenu ? 'none' : 'block' }}
             >
               <TextField id='filled-basic' label='輸入地址...' variant='filled' size='small' />
