@@ -1,15 +1,3 @@
-// import React, { Component } from 'react';
-// import PropTypes from 'PropTypes';
-// import GoogleMapReact from 'google-map-react';
-
-//https://www.npmjs.com/package/google-map-react
-
-/*document.getElementsByTagName('heade')[0].appendChild(() => {
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + key + '&libraries=places&callback=initMap';
-    return script;
-});*/
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose, withProps, withHandlers, withState } from 'recompose';
@@ -23,7 +11,10 @@ const refs = {
     map: undefined,
     types: ['restaurant'],
 };
+//https://tomchentw.github.io/react-google-maps/#!/Documentation
 //https://neighborhood999.github.io/recompose/docs/API.html
+//https://stackoverflow.com/questions/59716825/google-maps-api-deprecation-error-in-vuejs-web-app-utc-offset-is-deprecated-as
+//https://github.com/xkjyeah/vue-google-maps/issues/675
 export const GoogleMap = compose(
     withProps({
         googleMapURL: 'https://maps.googleapis.com/maps/api/js?key=' + key + '&v=3.exp&libraries=places',
@@ -48,9 +39,9 @@ export const GoogleMap = compose(
             const service = new google.maps.places.PlacesService(refs.map.context.__SECRET_MAP_DO_NOT_USE_OR_YOU_WILL_BE_FIRED);
             const request = {
                 bounds: bounds,
-                // radius: '500',
+                // radius: 500000,
                 type: refs.types,
-                fields: ['opening_hours', 'utc_offset_minutes'],
+                // fields: ['opening_hours', 'utc_offset_minutes'],
             };
             service.nearbySearch(request, (results, status) => {
                 // eslint-disable-next-line no-undef
@@ -78,7 +69,10 @@ export const GoogleMap = compose(
         const places = refs.searchBox.getPlaces();
         // eslint-disable-next-line no-undef
         const bounds = new google.maps.LatLngBounds();
-
+        // console.log(places);
+        // console.log(places[0].photos[0].getUrl());
+        const address = { formatted_address: places[0].formatted_address, name: places[0].name, address_components: places[0].address_components };
+        this.props.getSearchBoxAddress(address);
         places.forEach(place => {
             if (place.geometry.viewport) {
                 bounds.union(place.geometry.viewport);
@@ -123,7 +117,7 @@ export const GoogleMap = compose(
         if (element !== undefined) inputElement = element;
         return inputElement;
     }
-
+    //https://www.techmarks.com/google-map-lng-lat/
     render() {
         const { props, state } = this;
         return (
@@ -131,8 +125,9 @@ export const GoogleMap = compose(
                 onTilesLoaded={props.fetchPlaces}
                 ref={props.onMapMounted}
                 onBoundsChanged={props.fetchPlaces}
-                defaultZoom={8}
-                defaultCenter={{ lat: 51.508530, lng: -0.076132 }}>
+                defaultZoom={10}
+                defaultCenter={{ lat: 25.0171608, lng: 121.3662925 }}
+            >
                 <SearchBox
                     ref={props.onSearchBoxMounted}
                     bounds={props.bounds}
@@ -143,8 +138,7 @@ export const GoogleMap = compose(
                     {this.inputRender(props.input)}
                 </SearchBox>
                 {state.places && state.places.map((place, i) => {
-                    // console.log(place);
-                    return (<Marker key={i} position={{ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }} />);
+                    return (<Marker key={i} onClick={(e) => props.onMarkerClick(e, place)} position={{ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }} />);
                 })}
             </GoogleMapReact>
         );
@@ -161,10 +155,14 @@ export const GoogleMap = compose(
         bounds: PropTypes.any,
         input: PropTypes.object,
         type: PropTypes.array,
-        setPlaces: PropTypes.func
+        setPlaces: PropTypes.func,
+        onMarkerClick: PropTypes.func,
+        getSearchBoxAddress: PropTypes.func
     }
     static defaultProps = {
-        setPlaces: () => { }
+        setPlaces: () => { },
+        onMarkerClick: () => { },
+        getSearchBoxAddress: () => { }
     }
 });
 

@@ -17,17 +17,18 @@ export default {
   effects: {
     *viewTable_change({ payload, callback, loading }, { call, put }) {  // eslint-disable-line
       yield put({ type: 'set_view_table', payload });
-      if (callback) callback(loading);
+      if (loading) { loading(false); }
+      if (callback) { callback(); }
     },
     *viewMenu_change({ payload, callback, loading }, { call, put }) {  // eslint-disable-line
-      console.log(123);
       yield put({ type: 'set_view_menu', payload });
-      if (callback) callback(loading);
+      if (loading) { loading(false); }
+      if (callback) { callback(); }
     },
     *inputValue_change({ payload, callback, loading }, { call, put }) {  // eslint-disable-line
-      console.log(123);
       yield put({ type: 'set_input_value', payload });
-      if (callback) callback(loading);
+      if (loading) { loading(false); }
+      if (callback) { callback(); }
     }
   },
 
