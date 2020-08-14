@@ -5,7 +5,6 @@
 - dotenv
 - material-ui
 - react-google-maps
-- dva
 - eslint
 - babel
 - webpack
