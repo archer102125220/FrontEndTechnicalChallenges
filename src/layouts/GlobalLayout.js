@@ -43,8 +43,8 @@ const styles = (them) => {
         '& > *': {
             margin: them.spacing(1),
             backgroundColor: 'rgb(255,255,255,0.7)',
-            width: '40vh',
-            height: '45vw',
+            width: '40vw',
+            height: '45vh',
         },
     };
     return {
@@ -62,8 +62,8 @@ const styles = (them) => {
         parper,
         parperIsMobile: {
             ...parper,
-            right: '24vh',
-            top: '95vw'
+            right: '55vw',
+            top: '50vh'
         },
     };
 };
