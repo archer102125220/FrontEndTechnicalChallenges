@@ -51,6 +51,7 @@ export const GoogleMap = compose(
                     //     console.log(places, isOpenNow);
                     //     return isOpenNow;
                     // });
+                    // console.log({ results });
                     updatePlaces(results);
                 }
             });

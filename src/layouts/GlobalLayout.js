@@ -23,6 +23,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Button from './../lib/components/Button';
 import Table from './../lib/components/Table';
 import ExpansionPanel from './../lib/components/ExpansionPanel';
+import MyList from './../lib/components/List';
 
 const styles = (them) => {
     const style = {
@@ -32,6 +33,19 @@ const styles = (them) => {
         height: '5vh',
         borderRadius: 0,
         boxShadow: '0px 0px 0px 0px rgba(0,0,0,0.2), 0px 0px 0px 0px rgba(0,0,0,0.14), 0px 0px 0px 0px rgba(0,0,0,0.12)',
+    };
+    const parper = {
+        display: 'flex',
+        position: 'fixed !important',
+        // flexWrap: 'wrap',
+        right: '1vh',
+        top: '10vw',
+        '& > *': {
+            margin: them.spacing(1),
+            backgroundColor: 'rgb(255,255,255,0.7)',
+            width: '40vh',
+            height: '45vw',
+        },
     };
     return {
         paperTitle: {
@@ -45,17 +59,11 @@ const styles = (them) => {
             paddingRight: '10px',
             textAlign: 'right'
         },
-        parper: {
-            display: 'flex',
-            position: 'fixed !important',
-            // flexWrap: 'wrap',
-            right: '1vh',
-            top: '10Vw',
-            '& > *': {
-                margin: them.spacing(1),
-                width: them.spacing(16),
-                height: them.spacing(16),
-            },
+        parper,
+        parperIsMobile: {
+            ...parper,
+            right: '24vh',
+            top: '95vw'
         },
     };
 };
@@ -116,9 +124,9 @@ export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(
                     </Grid>
                 </Grid>
                 {children}
-                {/* <div className={classes.parper}>
-                    <Paper elevation={3} />
-                </div> */}
+                <div className={isMobile ? classes.parperIsMobile : classes.parper}>
+                    <MyList button={true} data={places} dataTitle='name' />
+                </div>
                 <Drawer
                     variant="persistent"
                     anchor='top'
