@@ -27,7 +27,8 @@ const useStyles = (/*theme*/) => ({
 export default withStyles(useStyles)(class PinnedSubheaderList extends Component {
 
     render() {
-        const { classes, data, dataTitle, button } = this.props;
+        const { props } = this;
+        const { classes, data, dataTitle, button, onClick } = props;
 
         return (
             <List className={classes.root} subheader={<li />}>
@@ -47,7 +48,7 @@ export default withStyles(useStyles)(class PinnedSubheaderList extends Component
                 <li className={classes.listSection}>
                     {
                         data.map((element, key) => (
-                            <ListItem button={button} key={key}>
+                            <ListItem button={button} key={key} onClick={(e) => onClick(e, element)}>
                                 <ul className={classes.ul}>
                                     {
                                         dataTitle === '' ?
@@ -66,11 +67,13 @@ export default withStyles(useStyles)(class PinnedSubheaderList extends Component
         classes: PropTypes.object.isRequired,
         data: PropTypes.array,
         dataTitle: PropTypes.any,
-        button: PropTypes.bool
+        button: PropTypes.bool,
+        onClick: PropTypes.func,
     }
     static defaultProps = {
         data: [0, 1, 2, 3, 4],
         dataTitle: '',
-        button: false
+        button: false,
+        onClick: () => { }
     }
 });

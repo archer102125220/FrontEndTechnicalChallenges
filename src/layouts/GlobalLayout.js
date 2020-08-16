@@ -13,15 +13,11 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import CloseIcon from '@material-ui/icons/Close';
 import Button from './../lib/components/Button';
 import Table from './../lib/components/Table';
+import Dialog from './../lib/components/Dialog';
 import ExpansionPanel from './../lib/components/ExpansionPanel';
 import MyList from './../lib/components/List';
 
@@ -69,15 +65,11 @@ const styles = (them) => {
 };
 
 const mapStateToProps = (state) => ({
-    viewTable: _.get(state, 'globall.viewTable', false),
-    viewMenu: _.get(state, 'globall.viewMenu', false),
     places: _.get(state, 'placesList.placesList', []),
     searchBoxAddress: _.get(state, 'placesList.searchBoxAddress', {}),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    viewTable_change: (payload, callback, loading) => dispatch({ type: 'globall/viewTable_change', payload, callback, loading }),
-    viewMenu_change: (payload, callback, loading) => dispatch({ type: 'globall/viewMenu_change', payload, callback, loading }),
     goToRoute: (path, callback) => {
         dispatch(routerRedux.push(path));
         if (callback) { callback(); }
@@ -89,7 +81,11 @@ export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(
         constructor(props) {
             super(props);
             this.state = {
-                titles: [//icon name vicinity photos rating price_level
+                viewTable: false,
+                viewMenu: false,
+                viewDetailed: false,
+                detailed: {},
+                titles: [
                     { id: 'name', numeric: false, disablePadding: true, label: '餐廳名稱' },
                     { id: 'vicinity', numeric: false, disablePadding: false, label: '地址' },
                     { id: 'rating', numeric: true, disablePadding: false, label: '評價(星)' },
@@ -98,15 +94,17 @@ export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(
             };
         }
         menu_change = (open) => {
-            const { viewMenu_change } = this.props;
-            viewMenu_change(open);
+            this.setState({ viewMenu: open });
         }
         table_change = (open) => {
-            const { viewTable_change } = this.props;
-            viewTable_change(open);
+            this.setState({ viewTable: open });
+        }
+        detailed_change = (open, place) => {
+            this.setState({ viewDetailed: open, detailed: place });
         }
         render() {
-            const { children, classes, isMobile, viewMenu, viewTable, searchBoxAddress } = this.props;
+            const { viewTable, viewMenu, viewDetailed } = this.state;
+            const { children, classes, isMobile, searchBoxAddress } = this.props;
             let { places } = this.props;
             const { titles } = this.state;
             const price_level_change = ['價格親民', '價格略高', '略顯昂貴', '高檔消費'];
@@ -125,16 +123,16 @@ export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(
                 </Grid>
                 {children}
                 <div className={isMobile ? classes.parperIsMobile : classes.parper}>
-                    <MyList button={true} data={places} dataTitle='name' />
+                    <MyList button={true} data={places} dataTitle='name' onClick={(e, place) => this.detailed_change(false, place)} />
                 </div>
                 <Drawer
-                    variant="persistent"
+                    variant='persistent'
                     anchor='top'
                     open={viewMenu}
                     onClose={() => this.menu_change(false)}
                 >
                     <div
-                        role="presentation"
+                        role='presentation'
                         onClick={() => this.menu_change(false)}
                         onKeyDown={() => this.menu_change(false)}
                     >
@@ -155,20 +153,28 @@ export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(
                     fullWidth={true}
                     maxWidth='xl'
                     scroll='paper'
-                    aria-labelledby="scroll-dialog-title"
-                    aria-describedby="scroll-dialog-description"
+                    aria-labelledby='scroll-dialog-title'
+                    aria-describedby='scroll-dialog-description'
+                    title={DialogTitleOutout}
+                    bottom={<Button onClick={() => this.table_change(false)} color='primary'>
+                        <CloseIcon />
+                    </Button>}
                 >
-                    <DialogTitle>{DialogTitleOutout}</DialogTitle>
-                    <DialogContent dividers={true}>
-                        <DialogContentText component='span'>
-                            {isMobile ? <ExpansionPanel data={places} dataTitle={titles} /> : <Table rowData={places} rowTitle={titles} />}
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => this.table_change(false)} color="primary">
-                            <CloseIcon />
-                        </Button>
-                    </DialogActions>
+                    {isMobile ? <ExpansionPanel data={places} dataTitle={titles} /> : <Table rowData={places} rowTitle={titles} />}
+                </Dialog>
+                <Dialog
+                    open={viewDetailed}
+                    onClose={() => this.detailed_change(false)}
+                    fullWidth={true}
+                    maxWidth='xl'
+                    scroll='paper'
+                    aria-labelledby='scroll-dialog-title'
+                    aria-describedby='scroll-dialog-description'
+                    title={<div style={{ textAlign: 'right' }}><Button onClick={() => this.detailed_change(false)} color='primary'>
+                        <CloseIcon />
+                    </Button></div>}
+                >
+
                 </Dialog>
             </Typography>);
         }
@@ -178,11 +184,8 @@ export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(
             isMobile: PropTypes.bool.isRequired,
             children: PropTypes.any,
             viewMenu: PropTypes.bool,
-            viewMenu_change: PropTypes.func,
-            viewTable: PropTypes.bool,
-            viewTable_change: PropTypes.func,
             places: PropTypes.array,
-            searchBoxAddress: PropTypes.any,
+            searchBoxAddress: PropTypes.any
         }
     }
 ));

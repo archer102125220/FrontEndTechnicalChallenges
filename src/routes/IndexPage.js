@@ -53,17 +53,9 @@ class IndexPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputValue: '',
       places: []
     };
   }
-
-  valueChange = (e) => {
-    this.setState({
-      inputValue: e.target.value
-    });
-  }
-
   setPlaces = (places) => {
     this.props.GET_PlacesList(places);
   }
