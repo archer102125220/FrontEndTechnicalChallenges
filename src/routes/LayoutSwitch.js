@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Switch } from 'dva/router';
 import { connect } from 'dva';
-import _ from 'lodash';
+// import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { enquireScreen } from 'enquire-js';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
@@ -11,8 +11,7 @@ import GlobalLayout from './../layouts/GlobalLayout';
 
 const theme = createMuiTheme(themCofing);
 
-const mapStateToProps = (state) => ({
-    places: _.get(state, 'placesList.placesList', []),
+const mapStateToProps = (/*state*/) => ({
 });
 
 const mapDispatchToProps = (/*dispatch*/) => ({
@@ -46,9 +45,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
 
         render() {
             const { props, state } = this;
-            const { children/*, history*/ } = props;
-            // const { location } = history;
-            // const { pathname } = location;
+            const { children } = props;
             return (
                 <ThemeProvider theme={theme}>
                     {
@@ -60,7 +57,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(
         }
         static propTypes = {
             children: PropTypes.any,
-            history: PropTypes.any,
             // SOCKET_UserList: PropTypes.func,
         };
     }
