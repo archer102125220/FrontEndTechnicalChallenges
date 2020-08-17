@@ -5,7 +5,7 @@ import { withScriptjs, withGoogleMap, Marker } from 'react-google-maps';
 import { SearchBox } from 'react-google-maps/lib/components/places/SearchBox';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import icon from './../../public/assets/favicon.ico';
+import icon from './../assets/favicon.ico';
 const { GoogleMap: GoogleMapReact } = require('react-google-maps');
 
 const key = process.env.GOOGLE_MAP_API_KEY;

@@ -63,7 +63,7 @@ module.exports = {
       }
     }, {
       test: /\.(png|jpg|ico)$/,
-      include: path.join(__dirname, 'public/assets'),
+      include: path.join(__dirname, 'src/assets'),
       loader: 'file-loader'
     }, {
       enforce: 'pre',
