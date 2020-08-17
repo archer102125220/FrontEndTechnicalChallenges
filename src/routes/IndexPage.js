@@ -149,22 +149,28 @@ class IndexPage extends Component {
   searchBoxAddress_change = (searchBoxAddress) => {
     this.setState({ searchBoxAddress });
   }
+  toLocation = () => {
+    this.setState({
+      returnLocation: true
+    }, () => this.setState({ returnLocation: false }));
+  }
 
   componentDidMount = () => {
     this.enquireHandler = enquireScreen(mobile => {
       this.setState({
         isMobile: mobile ? true : false,
+        returnLocation: false
       });
     }/*, '(max-width: 1024px)' */);
   }
 
   render() {
     const { classes } = this.props;
-    const { isMobile, titles, viewTable, viewMenu, viewDetailed, searchBoxAddress, detailed } = this.state;
+    const { isMobile, titles, viewTable, viewMenu, viewDetailed, searchBoxAddress, detailed, returnLocation } = this.state;
     let { places } = this.state;
     const price_level_change = ['價格親民', '價格略高', '略顯昂貴', '高檔消費'];
     places = places.map(element => ({ ...element, price_level_change: price_level_change[Math.floor(element.price_level)] }));
-    const DialogTitleOutout = (searchBoxAddress.name === undefined ? '台灣台北' : searchBoxAddress.name) + ' 附近的20間餐廳';
+    const DialogTitleOutout = (searchBoxAddress.name === undefined ? '目前位置' : searchBoxAddress.name) + ' 附近的20間餐廳';
     const tileData = (detailed.photos || []).map(element => ({
       img: element.getUrl(),
       title: 'Image',
@@ -178,19 +184,23 @@ class IndexPage extends Component {
             <Paper className={classes.paperTitle}>FrontEndTechnicalChallenges</Paper>
           </Grid>
           <Grid item xs={6}>
-            <Paper className={classes.paperButton}>{
-              !isMobile ? <Button onClick={() => this.table_change(true)}>顯示表格</Button> : <Button onClick={() => this.menu_change(true)} style={{ height: '5vh', borderRadius: 15, top: '-2px' }}><DehazeIcon /></Button>
-            }</Paper>
+            <Paper className={classes.paperButton}>
+              <Button style={{ marginRight: 10 }} onClick={() => this.toLocation()}>回到目前位置</Button>
+              {
+                !isMobile ? <Button onClick={() => this.table_change(true)}>顯示表格</Button> : <Button onClick={() => this.menu_change(true)} style={{ height: '5vh', borderRadius: 15, top: '-2px' }}><DehazeIcon /></Button>
+              }
+            </Paper>
           </Grid>
         </Grid>
         <div className={classes.normal}>
           <GoogleMap
             setPlaces={this.setPlaces}
+            toLocation={returnLocation}
             input={
               <div className={isMobile ? classes.isMobileRoot : classes.root}
                 style={{ display: isMobile && !viewMenu ? 'none' : 'block', zIndex: '2147483584' }}
               >
-                <TextField id='filled-basic' label='輸入地址...' defaultValue='台灣台北' variant='filled' size='small' />
+                <TextField id='filled-basic' label='輸入地址...' variant='filled' size='small' />
               </div>
             }
             getSearchBoxAddress={this.searchBoxAddress_change}

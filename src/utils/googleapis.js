@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { compose, withProps, withHandlers, withState } from 'recompose';
 import { withScriptjs, withGoogleMap, Marker } from 'react-google-maps';
 import { SearchBox } from 'react-google-maps/lib/components/places/SearchBox';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import icon from './../../public/assets/favicon.ico';
 const { GoogleMap: GoogleMapReact } = require('react-google-maps');
 
 const key = process.env.GOOGLE_MAP_API_KEY;
@@ -62,7 +65,9 @@ export const GoogleMap = compose(
     constructor(props) {
         super(props);
         this.state = {
-            places: []
+            places: [],
+            locationMarker: { lat: 0, lng: 0 },
+            alertOpen: false
         };
     }
 
@@ -74,14 +79,51 @@ export const GoogleMap = compose(
         // console.log(places[0].photos[0].getUrl());
         const address = { formatted_address: places[0].formatted_address, name: places[0].name, address_components: places[0].address_components };
         this.props.getSearchBoxAddress(address);
+        // console.log(bounds);
         places.forEach(place => {
             if (place.geometry.viewport) {
+                console.log(place.geometry.viewport);
                 bounds.union(place.geometry.viewport);
             } else {
+                console.log(place.geometry.location);
                 bounds.extend(place.geometry.location);
             }
         });
         refs.map.fitBounds(bounds);
+    }
+
+    getLocation = () => {
+        if (navigator.geolocation) {
+
+            // 使用者不提供權限，或是發生其它錯誤
+            // eslint-disable-next-line no-inner-declarations
+            function error() {
+                alert('無法取得您的位置');
+            }
+
+            // 使用者允許抓目前位置，回傳經緯度
+            // eslint-disable-next-line no-inner-declarations
+            const success = (position) => {
+                // eslint-disable-next-line no-undef
+                const bounds = new google.maps.LatLngBounds();
+                const { locationMarker } = this.state;
+                const { lat, lng } = locationMarker;
+                // console.log({ lat: position.coords.latitude, lng: position.coords.longitude });
+                if (lat !== position.coords.latitude && lng !== position.coords.longitude) this.setState({ locationMarker: { lat: position.coords.latitude, lng: position.coords.longitude } });
+                bounds.extend({ lat: position.coords.latitude, lng: position.coords.longitude });
+                refs.map.fitBounds(bounds);
+                // console.log(bounds.extend);
+            };
+
+            // 跟使用者拿所在位置的權限
+            navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+            alert('Sorry, 您的裝置不支援地理位置功能。');
+        }
+    }
+
+    componentDidMount() {
+        this.getLocation();
     }
 
     componentDidUpdate() {
@@ -121,27 +163,38 @@ export const GoogleMap = compose(
     //https://www.techmarks.com/google-map-lng-lat/
     render() {
         const { props, state } = this;
+        const { locationMarker, alertOpen } = state;
+        console.log(alertOpen);
+        if (props.toLocation) this.getLocation();
         return (
-            <GoogleMapReact
-                onTilesLoaded={props.fetchPlaces}
-                ref={props.onMapMounted}
-                onBoundsChanged={props.fetchPlaces}
-                defaultZoom={10}
-                defaultCenter={{ lat: 25.0171608, lng: 121.3662925 }}
-            >
-                <SearchBox
-                    ref={props.onSearchBoxMounted}
-                    bounds={props.bounds}
-                    // eslint-disable-next-line no-undef
-                    controlPosition={google.maps.ControlPosition.TOP_LEFT}
-                    onPlacesChanged={this.onPlacesChanged}
+            <span>
+                <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={alertOpen} autoHideDuration={3000} onClose={(event, reason) => this.setState({ alertOpen: reason === 'clickaway' })}>
+                    <MuiAlert elevation={6} variant='filled' severity='info'>
+                        此為目前位置
+                </MuiAlert>
+                </Snackbar>
+                <GoogleMapReact
+                    onTilesLoaded={props.fetchPlaces}
+                    ref={props.onMapMounted}
+                    onBoundsChanged={props.fetchPlaces}
+                    defaultZoom={10}
+                    defaultCenter={{ lat: 25.0171608, lng: 121.3662925 }}
                 >
-                    {this.inputRender(props.input)}
-                </SearchBox>
-                {state.places && state.places.map((place, i) => {
-                    return (<Marker key={i} onClick={(e) => props.onMarkerClick(e, place)} position={{ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }} />);
-                })}
-            </GoogleMapReact>
+                    <SearchBox
+                        ref={props.onSearchBoxMounted}
+                        bounds={props.bounds}
+                        // eslint-disable-next-line no-undef
+                        controlPosition={google.maps.ControlPosition.TOP_LEFT}
+                        onPlacesChanged={this.onPlacesChanged}
+                    >
+                        {this.inputRender(props.input)}
+                    </SearchBox>
+                    <Marker icon={icon} onClick={() => this.setState({ alertOpen: true })} position={locationMarker} />
+                    {state.places && state.places.map((place, i) => {
+                        return (<Marker key={i} onClick={(e) => props.onMarkerClick(e, place)} position={{ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }} />);
+                    })}
+                </GoogleMapReact>
+            </span>
         );
     }
     static propTypes = {
@@ -158,7 +211,8 @@ export const GoogleMap = compose(
         type: PropTypes.array,
         setPlaces: PropTypes.func,
         onMarkerClick: PropTypes.func,
-        getSearchBoxAddress: PropTypes.func
+        getSearchBoxAddress: PropTypes.func,
+        toLocation: PropTypes.bool
     }
     static defaultProps = {
         setPlaces: () => { },

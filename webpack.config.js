@@ -62,7 +62,7 @@ module.exports = {
         }
       }
     }, {
-      test: /\.(png|jpg)$/,
+      test: /\.(png|jpg|ico)$/,
       include: path.join(__dirname, 'public/assets'),
       loader: 'file-loader'
     }, {
